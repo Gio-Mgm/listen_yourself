@@ -1,0 +1,7 @@
+__pycache__
+.ipynb_checkpoints
+.env
+.vscode
+node_modules
+env385
+data
