@@ -1,20 +1,22 @@
-const fetchRequest = async (endpoint, args) => {
-    const token = localStorage.getItem("access_token")
-    const url = 'http://127.0.0.1:8000/api/' + endpoint
-    console.log(args)
+import { API_PATH } from '../constants/global'
+
+const fetchRequest = async (method, endpoint, data, headers={}) => {
+    const url = API_PATH + endpoint
+
     const init = {
         crossDomain: true,
-        method:'GET',
+        method:method,
         mode: "cors",
         headers: {
             "Content-Type": "application/json",
-            "AccessToken": token,
-            ...args
-        }
+            ...headers
+        },
+    }
+    if (method === "POST") {
+        init.body = JSON.stringify(data)
     }
 
-    const response = await fetch(url, init)
-    return await response.json()
+    return await fetch(url, init)
 }
 
 export default fetchRequest

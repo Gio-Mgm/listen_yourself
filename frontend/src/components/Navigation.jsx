@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar, Nav, NavDropdown, Container, Form, FormControl, Button } from 'react-bootstrap'
-import Dashboard from './Dashboard';
-import Analyze from './Analyze';
+// import Dashboard from './Dashboard';
+// import Analyze from './Analyze';
 
 
 const Navigation = ({ isLinked, setView, ThemeToggler, theme}) => {
@@ -21,7 +21,7 @@ const Navigation = ({ isLinked, setView, ThemeToggler, theme}) => {
     return (
         <Navbar bg={theme} variant={theme} expand="lg">
             <Container fluid>
-                <Navbar.Brand href="/home">Melomaniac</Navbar.Brand>
+                <Navbar.Brand id="brand" href="/">& Listen</Navbar.Brand>
                 <Navbar.Toggle aria-controls="navbarScroll" />
                 <Navbar.Collapse id="navbarScroll">
                     <Nav    onSelect={e => setView(e)} className="me-auto my-2 my-lg-0"

@@ -13,7 +13,7 @@ def create_database():
     return _database.Base.metadata.create_all(bind=_database.engine)
 
 
-def read_db():
+def get_db():
     db = _database.SessionLocal()
     try:
         yield db
@@ -26,16 +26,12 @@ def read_db():
 # ---------------------- #
 
 
-def create_user(db: _orm.Session, user: _schemas.User):
+def create_user(db: _orm.Session, user: _schemas.UserCreate):
     """
         query create user
     """
-    db_user = _models.User(
-        user_email=user.email,
-        user_name=user.name,
-        user_enc_password=user.enc_password,
-        user_register_date=date.today()
-    )
+
+    db_user = _models.User(**user.dict())
     db.add(db_user)
     try:
         db.commit()
@@ -46,12 +42,28 @@ def create_user(db: _orm.Session, user: _schemas.User):
     return db_user
 
 
-def read_user(db: _orm.Session, user_id: int):
+def get_user(db: _orm.Session, user_id: int):
     """
         query read user
     """
 
     return db.query(_models.User).filter(_models.User.user_id == user_id).first()
+
+
+def get_user_by_email(db: _orm.Session, user_email: str):
+    """
+        query read user
+    """
+
+    return db.query(_models.User).filter(_models.User.user_email == user_email).first()
+
+
+def login(db: _orm.Session, user_name: str, user_enc_password: str):
+    """
+        query connection of user
+    """
+
+    return db.query(_models.User).filter(and_(_models.User.user_name == user_name, _models.User.user_enc_password == user_enc_password)).first()
 
 
 def update_user(db: _orm.Session, user_id: int, email: str, name: str, password: str):
@@ -153,15 +165,6 @@ def delete_prediction(db: _orm.Session, prediction_id: int):
 
     db.query(_models.Prediction).filter(_models.Prediction.prediction_id == prediction_id).delete()
     db.commit()
-
-
-def read_predictions(db: _orm.Session, offset: int, limit: int):
-    """
-        query read all predictions
-    """
-
-    return db.query(_models.Prediction).offset(offset).limit(limit).all()
-
 
 def read_mean(db: _orm.Session, user_id: int, start: str, end: str):
     """

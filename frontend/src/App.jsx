@@ -5,12 +5,14 @@ import NotFound from './pages/NotFound';
 import Home from './pages/Home';
 
 const App = () => {
-    const [isLogged, setIsLogged] = useState(false);
+    const [user, setUser] = useState(localStorage.getItem("user"));
     return (
         <BrowserRouter>
             <Routes>
-                <Route path='/' element={<LoginApp setIsLogged={setIsLogged} />}/>
-                <Route path='/home' element={<Home />}/>
+                { user ?
+                    <Route path='/' element={<Home user={user} setUser={setUser}/>}/> :
+                    <Route path='/' element={<LoginApp setUser={setUser} />}/>
+                }
                 <Route path='/*' element={<NotFound />}/>
                 {/* <Route path='/' element={}/> */}
             </Routes>

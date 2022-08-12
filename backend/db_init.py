@@ -2,6 +2,7 @@ import os
 from . import Database
 from dotenv import load_dotenv
 
+# TODO delete this file when Database.py refactored
 load_dotenv()
 
 HOST = os.getenv('HOST')

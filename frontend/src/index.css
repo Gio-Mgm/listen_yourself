@@ -19,16 +19,15 @@ body {
 .header-login-div {
     margin: 10px 30%;
     border-radius: 25px;
-    background-color: rgb(32, 27, 27);
+    background-color: rgb(7, 6, 6);
     border: solid 1px rgb(158, 5, 145);
-    opacity: 80%;
+    opacity: 94%;
 }
 
 .heading-login, #not-found > h1 {
     padding-top:5px;
     text-align: center;
     font-family:"Musicografi";
-
 }
 
 .rainbow-lr{
@@ -118,7 +117,10 @@ padding: 0 20px;
 line-height:30px;
 }
 
-
+#brand {
+    font-family:"Musicografi";
+    font-size: 1.5em!important;
+}
 
 #log-submit {
     width: 100px;

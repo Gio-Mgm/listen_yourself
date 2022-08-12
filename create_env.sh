@@ -1,2 +1,2 @@
 # Create conda env in current folder -> install conda packages -> activate env -> install pip packages
-conda env create -f environment.yml -p ./env && conda activate ./env && pip install requirements.txt
+conda env create -p ./env && conda activate ./env &&  conda install -y -f environment.yml && pip install -- requirements.txt

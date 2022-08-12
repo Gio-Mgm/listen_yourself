@@ -1,12 +1,23 @@
 import React, { useState } from 'react'
 import { Form, Button, Alert } from 'react-bootstrap'
 import C from '../constants/loginApp';
+import { ERRORS } from '../constants/global';
+import { encrypt } from '../utils/encryption';
+import validate_form from '../utils/validate_form';
+import fetchRequest from '../utils/request';
 
-const LoginApp = ({ setIsLogged }) => {
+const LoginApp = ({ setUser }) => {
     const [errorMessages, setErrorMessages] = useState({});
-    const [logInOrSignUp, setLogInOrSignUp] = useState("login")
+    const [logInOrSignUp, setLogInOrSignUp] = useState("signup")
     const [open, setOpen] = useState(false);
-    const [input, setInput] = useState({});
+    // TODO remove default values
+    // const [input, setInput] = useState({})
+    const [input, setInput] = useState({
+        username: "username",
+        email: "test@test.com",
+        password: "password",
+        confirmation: "password"
+    });
     const [isValid, setIsValid] = useState(true)
 
     const handleInputChange = e => setInput({
@@ -20,66 +31,61 @@ const LoginApp = ({ setIsLogged }) => {
         setLogInOrSignUp(logInOrSignUp === "login" ? "signup" : "login")
     }
 
-    const validate = () => {
-        let errors = {}
-        let validityStatus = true
-        if (input["username"].length <= 6){
-            validityStatus = false
-            errors["username"] = "The name should contain more than 6 characters"
+    const authenticateUser = (queryType, data) => {
+        console.log()
+        let method = ""
+        let endpoint = ""
+        if (queryType === "login") {
+            method = 'POST'
+            endpoint = "/login"
+        } else {
+            method = 'POST'
+            endpoint = "/users"
         }
-        // if (input["email"].indexOf("@") === -1 ){
-        //     validityStatus = false
-        //     errors["email"] = "The email should contain @"
-        // }
-        if (input["password"].length <= 6){
-            validityStatus = false
-            errors["password"] = "The password should contain more than 6 characters"
-        }
+        fetchRequest(method, endpoint, data)
+        .then(res => {data
+            if (res.status >= 200 && res.status <= 299) {
+                return res.json()
+            } else {
+                let msg =
+                    res.status === 422 ? ERRORS.emailRegistered :
+                    res.status === 404 ? ERRORS.invalidLogin : null
 
-        if (logInOrSignUp === "signup" && input["password"] !== input["confirmation"]){
-            validityStatus = false
-            errors["confirmation"] = "Confirmation doesn't match password"
-        }
-
-        setErrorMessages(errors)
-        console.log(validityStatus)
-        return validityStatus
+                msg && setErrorMessages({"email": msg})
+                setIsValid(false)
+                throw new Error(msg ?? res.statusText)
+            }
+        })
+        .then(data => {
+            delete data.user_enc_password
+            console.log("data")
+            console.log(data)
+            localStorage.setItem("user", data)
+            setUser(data)
+        })
+        .catch(err => console.log(err))
     }
+
 
     const handleSubmit = e => {
         e.preventDefault()
-        if (validate()){
+        if (validate_form(input, logInOrSignUp, setErrorMessages)){
             setIsValid(true)
-            console.log("ok")
+            const data = {
+                user_name: input.username,
+                user_enc_password: encrypt(input.password)
+            }
+            if (logInOrSignUp ==="signup") {
+                data.user_email = input.email
+            }
+            authenticateUser(logInOrSignUp, data)
         } else {
             setIsValid(false)
         }
-        // setIsLogged(true)
-        // TODO authentification handler
-        // // Find user login info
-        // const userData = database.find((user) => user.username === uname.value);
-
-        // // Compare user info
-        // if (userData) {
-        //     if (userData.password !== pass.value) {
-        //     // Invalid password
-        //     setErrorMessages({ name: "password", message: .pass });
-        //     } else {
-        //     setIsSubmitted(true);
-        //     }
-        // } else {
-        //     // Username not found
-        //     setErrorMessages({ name: "username", message: .uname });
-        // }
     }
 
-    const renderErrorMessage = name => {
-        name === errorMessages[name] && (
-            <Alert variant='danger' className="error">{errorMessages.name}</Alert>
-        );
-    }
-
-    const renderFormInput = (name, type) => {
+    // TODO remove value
+    const renderFormInput = (name, type, value) => {
         return (
             <Form.Group key={name} className="mb-3" controlId={`form-${name}`}>
                 <Form.Label>[{name}]</Form.Label>
@@ -87,6 +93,7 @@ const LoginApp = ({ setIsLogged }) => {
                     onChange={handleInputChange}
                     autoComplete={name}
                     name={name}
+                    defaultValue={value}
                     placeholder={`Enter ${name}`}
                 />
                 {!isValid && errorMessages[name] &&
@@ -97,6 +104,21 @@ const LoginApp = ({ setIsLogged }) => {
         )
     }
 
+    const logFormComponent = (
+        <Form onSubmit={handleSubmit}>
+            <div id="form-container">
+                {/* TODO remove value */}
+                {C.inputFields
+                    .filter(item => item.scope.includes(logInOrSignUp))
+                    .map(({name, type, value}) => renderFormInput(name, type, value))
+                }
+            </div>
+            <Button id="log-submit" type="submit" onSubmit={handleSubmit} className='spotify-green' variant="primary" >
+                { C.connectionOptions[logInOrSignUp].text }
+            </Button>
+        </Form>
+    )
+
     return (
         <div className='reset-container login'>
             <div className="header-login-div">
@@ -104,24 +126,7 @@ const LoginApp = ({ setIsLogged }) => {
             </div>
             <div id="app-login" className='center'>
                 <h1>{C.connectionOptions[logInOrSignUp].text}</h1>
-
-                {/* {logInOrSignUp === "login" && (
-                    <>
-                        <Login setIsLogged={setIsLogged} />
-                        <p className="hr-text"><span>Or</span></p>
-                    </>
-                )} */}
-                <Form onSubmit={handleSubmit}>
-                    <div id="form-container">
-                        {C.inputFields
-                            .filter(item => item.scope.includes(logInOrSignUp))
-                            .map(({name, type}) => renderFormInput(name, type))
-                        }
-                    </div>
-                <Button id="log-submit" type="submit" className='spotify-green' variant="primary" >
-                    { C.connectionOptions[logInOrSignUp].text }
-                </Button>
-                </Form>
+                {logFormComponent}
                 <Button
                     id="switch"
                     aria-controls="confirmation"

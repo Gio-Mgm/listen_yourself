@@ -8,10 +8,10 @@ import database as _database
 class User(_database.Base):
     __tablename__ = "user"
 
-    user_id: Column(Integer, primary_key=True, index=True)
-    user_name: Column(String, unique=True)
-    user_email: Column(String, unique=True)
-    user_enc_password: Column(String)
+    user_id = Column(Integer, primary_key=True, index=True)
+    user_name = Column(String(255), unique=True)
+    user_email = Column(String(255), unique=True)
+    user_enc_password = Column(String(255))
     user_register_date = Column(Date, default=date.today())
 
     predictions = relationship("Prediction", back_populates="owner")
@@ -19,18 +19,19 @@ class User(_database.Base):
 
 class Prediction(_database.Base):
     __tablename__ = "prediction"
-    prediction_id: Column(Integer, primary_key=True, index=True)
-    user_id: Column(Integer, ForeignKey("user.user_id"))
-    prediction_img_path: Column(String, unique=True)
-    prediction_angry: Column(Float)
-    prediction_calm: Column(Float)
-    prediction_disgust: Column(Float)
-    prediction_fearful: Column(Float)
-    prediction_happy: Column(Float)
-    prediction_neutral: Column(Float)
-    prediction_sad: Column(Float)
-    prediction_surprised: Column(Float)
-    prediction_true: Column(String)
-    prediction_major: Column(String)
+
+    prediction_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.user_id"))
+    prediction_img_path = Column(String(255), unique=True)
+    prediction_angry = Column(Float)
+    prediction_calm = Column(Float)
+    prediction_disgust = Column(Float)
+    prediction_fearful = Column(Float)
+    prediction_happy = Column(Float)
+    prediction_neutral = Column(Float)
+    prediction_sad = Column(Float)
+    prediction_surprised = Column(Float)
+    prediction_true = Column(String(255))
+    prediction_major = Column(String(255))
 
     owner = relationship("User", back_populates="predictions")

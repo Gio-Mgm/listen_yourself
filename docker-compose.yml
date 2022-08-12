@@ -1,0 +1,41 @@
+services:
+  db:
+    container_name: db
+    image: mysql:8.0.17
+    env_file:
+      - ./backend/.env
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    volumes:
+      - ./frontend:/frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+  monitoring:
+    container_name: monitoring
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+volumes:
+  db_data:
+    external: true

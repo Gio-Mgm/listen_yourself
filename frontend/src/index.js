@@ -10,7 +10,7 @@ const root = createRoot(container);
 root.render(
     <React.StrictMode>
         <CookiesProvider>
-            <App tab="Home" />
+            <App />
         </CookiesProvider>
     </React.StrictMode>
 );

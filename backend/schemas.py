@@ -1,20 +1,31 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import date
 
 
+class UserBase(BaseModel):
+    user_name: str
+
+
+class UserCreate(UserBase):
+    user_email: EmailStr
+    user_enc_password: str
+
+
 class User(BaseModel):
-    user_id: Optional[int]
-    user_email: Optional[str]
-    user_name: Optional[str]
-    user_enc_password: Optional[str]
-    user_register_date: Optional[date]
+    user_id: int
+    user_email: str
+    user_register_date: date
+
 
     class Config:
         orm_mode = True
 
-# TODO split predsinto another class?
+# TODO split predsinto another
+# class?
+#
 # class PredictionResults(BaseModel):
+
 
 
 class Prediction(BaseModel):
@@ -31,6 +42,7 @@ class Prediction(BaseModel):
     prediction_surprised: float
     prediction_true: Optional[str]
     prediction_major: str
+
 
     class Config:
         orm_mode = True

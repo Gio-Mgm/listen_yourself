@@ -1,5 +1,6 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, RedirectResponse
 import uvicorn
 import sqlalchemy.orm as _orm
 import services as _services
@@ -11,8 +12,6 @@ from datetime import date
 app = FastAPI()
 
 origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:8080",
 ]
@@ -33,20 +32,35 @@ async def main():
     return {"message": "Hello World"}
 
 
-@app.post("/users/")
+@app.post("/users")
 def create_user(
-    user: _schemas.User,
+    user: _schemas.UserCreate,
+    response: Response,
     db: _orm.Session = Depends(_services.get_db)
 ):
     """
         Route for creating user
     """
-    response = _services.create_user(db=db, user=user)
-    return response
+    db_user = _services.get_user_by_email(db, user.user_email)
 
+    if db_user:
+        raise HTTPException(status_code=422, detail="Email already registered ! ")
+    return _services.create_user(db=db, user=user)
 
-@app.get("/users/{user_id}")
-def get_user(
+@app.post("/login")
+def login(
+    data: dict,
+    db: _orm.Session = Depends(_services.get_db),
+):
+    db_user = _services.login(db=db, **data)
+    print(db_user)
+
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="Invalid username or password")
+    return db_user
+
+@app.get("/user/{user_id}")
+def read_user(
     user_id: int,
     db: _orm.Session = Depends(_services.get_db)
 ):
@@ -56,7 +70,7 @@ def get_user(
 
     db_user = _services.get_user(db=db, user_id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="This user does not exist")
+        raise HTTPException(status_code=404, content="This user does not exist")
     print(db_user)
     return db_user
 
@@ -90,7 +104,7 @@ def read_prediction_list():
     pass
 
 
-@app.get("/users/")
+@app.get("/predictions/{user_id}")
 def get_predictions(
     skip: int = 0,
     limit: int = 10,
@@ -109,7 +123,7 @@ if __name__ == "__main__":
         "main:app",
         host="0.0.0.0",
         port=8000,
-        reload=False,
+        reload=True,
         log_level="debug",
         debug=True,
         workers=1,
