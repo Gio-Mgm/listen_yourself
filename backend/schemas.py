@@ -4,11 +4,10 @@ from datetime import date
 
 
 class UserBase(BaseModel):
-    user_name: str
+    user_email: EmailStr
 
 
 class UserCreate(UserBase):
-    user_email: EmailStr
     user_enc_password: str
 
 
@@ -21,12 +20,13 @@ class User(BaseModel):
     class Config:
         orm_mode = True
 
-# TODO split predsinto another
-# class?
+# TODO split preds into another class?
 #
 # class PredictionResults(BaseModel):
 
-
+class Predict(BaseModel):
+    user_id: int
+    src: str
 
 class Prediction(BaseModel):
     prediction_id: int

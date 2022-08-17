@@ -6,14 +6,15 @@ import { GlobalStyles } from "../utils/GlobalStyle";
 import { lightTheme, darkTheme } from "../utils/Themes"
 
 import Navigation from "../components/Navigation"
+import { Profile } from '../components/Profile';
+import { PredictionInput } from '../components/PredictionInput';
 
 const Home = ({user, setUser}) => {
 
     // component to display when nav item is clicked
     const [view, setView] = useState("")
-    // token for spotify API queries
 
-    const [theme, setTheme] = useState('light');
+    const [theme, setTheme] = useState('dark');
     const handleThemeToggle = () => theme === 'light' ? setTheme('dark') : setTheme('light')
 
     const ThemeToggler = () => (
@@ -44,10 +45,8 @@ const Home = ({user, setUser}) => {
     )
 
     useEffect(() => {
-        Object.entries(user).map((k, v) => {
-            console.log(k, v)
-        })}
-    , [])
+
+    }, [])
 
     return (
         <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -55,6 +54,8 @@ const Home = ({user, setUser}) => {
                 <div className='App'>
                     <Navigation setView={setView} ThemeToggler={ThemeToggler} theme={theme}/>
                     <Container fluid>
+                        <Profile user={user}/>
+                        <PredictionInput user={user} />
                         {/* {
                             !isLinked ? <Login /> :
                             view === "Dashboard" ? <Dashboard /> :

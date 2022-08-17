@@ -5,7 +5,7 @@ import NotFound from './pages/NotFound';
 import Home from './pages/Home';
 
 const App = () => {
-    const [user, setUser] = useState(localStorage.getItem("user"));
+    const [user, setUser] = useState("");
     return (
         <BrowserRouter>
             <Routes>

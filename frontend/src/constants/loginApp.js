@@ -1,17 +1,17 @@
 // TODO remove default values
 module.exports = Object.freeze({
     inputFields: [
-        {
-            name: "username",
-            type: "text",
-            scope: ["login", "signup"],
-            value: "username"
-        },
+        // {
+        //     name: "username",
+        //     type: "text",
+        //     scope: ["signup"],
+        //     value: "username"
+        // },
         {
             name: "email",
             type: "email",
-            scope: ["signup"],
-            value: "test@test.com"
+            scope: ["login", "signup"],
+            value: "user@lambda.com"
         },
         {
             name: "password",

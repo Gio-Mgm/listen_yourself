@@ -1,11 +1,17 @@
-from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi import Depends, FastAPI, HTTPException, Response, status, Body, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from pathlib import Path
 from fastapi.responses import JSONResponse, RedirectResponse
 import uvicorn
 import sqlalchemy.orm as _orm
+from deep_learning.functions import detect_face, make_prediction
 import services as _services
 import schemas as _schemas
 from datetime import date
+import numpy as np
+from PIL import Image
+from io import BytesIO
+import cv2
 
 # TODO Write missing requests
 
@@ -35,7 +41,6 @@ async def main():
 @app.post("/users")
 def create_user(
     user: _schemas.UserCreate,
-    response: Response,
     db: _orm.Session = Depends(_services.get_db)
 ):
     """
@@ -49,10 +54,10 @@ def create_user(
 
 @app.post("/login")
 def login(
-    data: dict,
+    user: _schemas.UserCreate,
     db: _orm.Session = Depends(_services.get_db),
 ):
-    db_user = _services.login(db=db, **data)
+    db_user = _services.login(db=db, user=user)
     print(db_user)
 
     if db_user is None:
@@ -85,9 +90,18 @@ def delete_user(id: int):
     pass
 
 
-@app.post("/prediction")
-def create_prediction():
-    pass
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    content =await file.read()
+    nparr = np.fromstring(content, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR).astype(np.float32)
+    face = detect_face(img)
+    print("FACES LEN", len(face))
+    if len(face) > 0:
+        results = make_prediction(face)
+        print("RESULTS", results)
+        return results
+
 
 
 @app.get("/prediction/{id}")

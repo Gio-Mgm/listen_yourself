@@ -8,15 +8,14 @@ import fetchRequest from '../utils/request';
 
 const LoginApp = ({ setUser }) => {
     const [errorMessages, setErrorMessages] = useState({});
-    const [logInOrSignUp, setLogInOrSignUp] = useState("signup")
+    const [logInOrSignUp, setLogInOrSignUp] = useState("login")
     const [open, setOpen] = useState(false);
     // TODO remove default values
     // const [input, setInput] = useState({})
     const [input, setInput] = useState({
-        username: "username",
-        email: "test@test.com",
-        password: "password",
-        confirmation: "password"
+        "email": "user@lambda.com",
+        "password": "password",
+        "confirmation": "password"
     });
     const [isValid, setIsValid] = useState(true)
 
@@ -25,25 +24,20 @@ const LoginApp = ({ setUser }) => {
         [e.currentTarget.name]: e.currentTarget.value
     })
 
-    const handleClick = () => {
+    const handleFormSwitch = () => {
         delete input["confirmation"]
         setOpen(!open)
+        setErrorMessages({})
         setLogInOrSignUp(logInOrSignUp === "login" ? "signup" : "login")
     }
 
     const authenticateUser = (queryType, data) => {
-        console.log()
-        let method = ""
-        let endpoint = ""
-        if (queryType === "login") {
-            method = 'POST'
-            endpoint = "/login"
-        } else {
-            method = 'POST'
-            endpoint = "/users"
+        let endpoint = queryType === "login" ? "/login" :  "/users"
+        const headers = {
+            "Content-Type": "application/json",
         }
-        fetchRequest(method, endpoint, data)
-        .then(res => {data
+        fetchRequest('POST', endpoint, data, headers)
+        .then(res => {
             if (res.status >= 200 && res.status <= 299) {
                 return res.json()
             } else {
@@ -58,9 +52,11 @@ const LoginApp = ({ setUser }) => {
         })
         .then(data => {
             delete data.user_enc_password
-            console.log("data")
-            console.log(data)
-            localStorage.setItem("user", data)
+            // Object.entries(data).forEach(([key, value]) => {
+            //     localStorage.setItem(key, value)
+            // })
+
+            localStorage.setItem("user_id", data.user_id)
             setUser(data)
         })
         .catch(err => console.log(err))
@@ -72,13 +68,13 @@ const LoginApp = ({ setUser }) => {
         if (validate_form(input, logInOrSignUp, setErrorMessages)){
             setIsValid(true)
             const data = {
-                user_name: input.username,
-                user_enc_password: encrypt(input.password)
+                user_email:input.email,
+                user_enc_password: encrypt(input.username + input.password)
             }
-            if (logInOrSignUp ==="signup") {
-                data.user_email = input.email
-            }
-            authenticateUser(logInOrSignUp, data)
+            // if (logInOrSignUp ==="signup") {
+            //     data.user_name = input.username
+            // }
+            authenticateUser(logInOrSignUp, JSON.stringify(data))
         } else {
             setIsValid(false)
         }
@@ -131,7 +127,7 @@ const LoginApp = ({ setUser }) => {
                     id="switch"
                     aria-controls="confirmation"
                     aria-expanded={open} variant="outline-primary"
-                    onClick={handleClick}>{ C.connectionOptions[logInOrSignUp].switch }
+                    onClick={handleFormSwitch}>{ C.connectionOptions[logInOrSignUp].switch }
                 </Button>
             </div>
         </div>

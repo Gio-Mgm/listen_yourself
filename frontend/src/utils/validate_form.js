@@ -8,10 +8,10 @@
 const validate_form = (input, log_type,  setErrorMessages) => {
     let errors = {}
     let validityStatus = true
-    if (input.username.length < 6) {
-        validityStatus = false
-        errors.username = "The name should contain more than 6 characters"
-    }
+    // if (input.username.length < 6) {
+    //     validityStatus = false
+    //     errors.username = "The name should contain more than 6 characters"
+    // }
     if (input.email && input.email.indexOf("@") === -1 ) {
         validityStatus = false
         errors.email = "The email should contain @"

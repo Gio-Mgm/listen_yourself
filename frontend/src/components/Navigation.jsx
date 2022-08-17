@@ -21,7 +21,7 @@ const Navigation = ({ isLinked, setView, ThemeToggler, theme}) => {
     return (
         <Navbar bg={theme} variant={theme} expand="lg">
             <Container fluid>
-                <Navbar.Brand id="brand" href="/">& Listen</Navbar.Brand>
+                <Navbar.Brand id="brand">& Listen Yourself</Navbar.Brand>
                 <Navbar.Toggle aria-controls="navbarScroll" />
                 <Navbar.Collapse id="navbarScroll">
                     <Nav    onSelect={e => setView(e)} className="me-auto my-2 my-lg-0"

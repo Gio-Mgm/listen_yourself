@@ -39,6 +39,7 @@ def create_user(db: _orm.Session, user: _schemas.UserCreate):
         db.rollback()
         return err
     db.refresh(db_user)
+
     return db_user
 
 
@@ -58,12 +59,13 @@ def get_user_by_email(db: _orm.Session, user_email: str):
     return db.query(_models.User).filter(_models.User.user_email == user_email).first()
 
 
-def login(db: _orm.Session, user_name: str, user_enc_password: str):
+def login(db: _orm.Session, user: _schemas.UserCreate):
     """
         query connection of user
     """
+    db_user =  db.query(_models.User).filter(and_(_models.User.user_email == user.user_email, _models.User.user_enc_password == user.user_enc_password)).first()
 
-    return db.query(_models.User).filter(and_(_models.User.user_name == user_name, _models.User.user_enc_password == user_enc_password)).first()
+    return db_user
 
 
 def update_user(db: _orm.Session, user_id: int, email: str, name: str, password: str):
@@ -71,7 +73,7 @@ def update_user(db: _orm.Session, user_id: int, email: str, name: str, password:
         query update user
     """
 
-    db_user = read_user(db=db, user_id=user_id)
+    db_user = get_user(db=db, user_id=user_id)
     db_user.user_email = email
     db_user.user_name = name
     db_user.user_enc_password = password
