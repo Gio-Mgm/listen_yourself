@@ -1,17 +1,27 @@
-from fastapi import Depends, FastAPI, HTTPException, Response, status, Body, UploadFile, File
+import os
+import hashlib
+from fastapi import Depends, FastAPI, HTTPException, status, Body, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from pathlib import Path
-from fastapi.responses import JSONResponse, RedirectResponse
 import uvicorn
 import sqlalchemy.orm as _orm
-from deep_learning.functions import detect_face, make_prediction
 import services as _services
 import schemas as _schemas
-from datetime import date
-import numpy as np
-from PIL import Image
-from io import BytesIO
-import cv2
+import database as _database
+from dotenv import load_dotenv
+from deep_learning.functions import detect_face, make_prediction
+
+load_dotenv()
+
+import sentry_sdk
+sentry_sdk.init(
+    dsn=os.environ["DSN"],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
 
 # TODO Write missing requests
 
@@ -31,6 +41,15 @@ app.add_middleware(
 )
 
 _services.create_database()
+admin = {
+    "user_email": os.environ["ADMIN_MAIL"],
+    "user_enc_password": hashlib.sha256(
+        str(os.environ["ADMIN_MAIL"]).encode('utf-8') +
+        str(os.environ["ADMIN_PASS"]).encode('utf-8')
+    ).hexdigest(),
+    "user_is_admin": 1
+}
+_services.create_user(db=_database.SessionLocal() ,user=admin)
 
 
 @app.get("/")
@@ -59,7 +78,6 @@ def login(
 ):
     db_user = _services.login(db=db, user=user)
     print(db_user)
-
     if db_user is None:
         raise HTTPException(status_code=404, detail="Invalid username or password")
     return db_user
@@ -92,15 +110,12 @@ def delete_user(id: int):
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    content =await file.read()
-    nparr = np.fromstring(content, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR).astype(np.float32)
-    face = detect_face(img)
-    print("FACES LEN", len(face))
-    if len(face) > 0:
-        results = make_prediction(face)
-        print("RESULTS", results)
-        return results
+    content = await file.read()
+    face = detect_face(content)
+    if len(face) == 0:
+        return HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="No face detected !")
+    return make_prediction(face)
+
 
 
 

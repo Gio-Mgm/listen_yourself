@@ -9,10 +9,10 @@ class User(_database.Base):
     __tablename__ = "user"
 
     user_id = Column(Integer, primary_key=True, index=True)
-    user_name = Column(String(255), nullable=True)
     user_email = Column(String(255), unique=True)
     user_enc_password = Column(String(255))
     user_register_date = Column(Date, default=date.today())
+    user_is_admin = Column(Integer, default=0)
 
     predictions = relationship("Prediction", back_populates="owner")
 

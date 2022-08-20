@@ -6,12 +6,10 @@ import sqlalchemy.orm as _orm
 from sqlalchemy import and_
 from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
-from datetime import date
 
 
 def create_database():
     return _database.Base.metadata.create_all(bind=_database.engine)
-
 
 def get_db():
     db = _database.SessionLocal()
@@ -30,8 +28,10 @@ def create_user(db: _orm.Session, user: _schemas.UserCreate):
     """
         query create user
     """
-
-    db_user = _models.User(**user.dict())
+    if type(user) == dict:
+        db_user = _models.User(**user)
+    else:
+        db_user = _models.User(**user.dict())
     db.add(db_user)
     try:
         db.commit()

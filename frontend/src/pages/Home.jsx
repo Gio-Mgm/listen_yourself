@@ -6,8 +6,8 @@ import { GlobalStyles } from "../utils/GlobalStyle";
 import { lightTheme, darkTheme } from "../utils/Themes"
 
 import Navigation from "../components/Navigation"
-import { Profile } from '../components/Profile';
-import { PredictionInput } from '../components/PredictionInput';
+import Profile from '../components/Profile';
+import Prediction from '../components/Prediction';
 
 const Home = ({user, setUser}) => {
 
@@ -47,7 +47,6 @@ const Home = ({user, setUser}) => {
     useEffect(() => {
 
     }, [])
-
     return (
         <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
             <GlobalStyles/>
@@ -55,7 +54,7 @@ const Home = ({user, setUser}) => {
                     <Navigation setView={setView} ThemeToggler={ThemeToggler} theme={theme}/>
                     <Container fluid>
                         <Profile user={user}/>
-                        <PredictionInput user={user} />
+                        <Prediction user={user} />
                         {/* {
                             !isLinked ? <Login /> :
                             view === "Dashboard" ? <Dashboard /> :

@@ -29,13 +29,6 @@ services:
       - "8080:8080"
     depends_on:
       - backend
-  monitoring:
-    container_name: monitoring
-    image: prom/prometheus
-    ports:
-      - "9090:9090"
-    depends_on:
-      - backend
 volumes:
   db_data:
     external: true

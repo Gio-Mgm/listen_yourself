@@ -6,6 +6,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
     favicon: './public/img/favico.ico'
 });
 const Dotenv = require('dotenv-webpack');
+const SentryCliPlugin = require('@sentry/webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -36,7 +37,14 @@ module.exports = {
     },
     plugins: [
         htmlPlugin,
-        new Dotenv()
+        new Dotenv(),
+        // new SentryCliPlugin({
+        //     include: '.',
+        //     ignoreFile: '.sentrycliignore',
+        //     ignore: ['node_modules', 'webpack.config.js'],
+        //     configFile: 'sentry.properties',
+        //     release: '1.0'
+        // }),
     ],
     devServer: {
         hot: true,

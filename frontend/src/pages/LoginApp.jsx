@@ -69,7 +69,7 @@ const LoginApp = ({ setUser }) => {
             setIsValid(true)
             const data = {
                 user_email:input.email,
-                user_enc_password: encrypt(input.username + input.password)
+                user_enc_password: encrypt(input.email + input.password)
             }
             // if (logInOrSignUp ==="signup") {
             //     data.user_name = input.username
