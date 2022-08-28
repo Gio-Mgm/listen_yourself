@@ -1,46 +1,46 @@
+import hashlib
 import os
-from . import Database
-from dotenv import load_dotenv
+from typing import Union
+from dotenv import load_dotenv  # noqa
 
-# TODO delete this file when Database.py refactored
 load_dotenv()
 
-HOST = os.getenv('HOST')
-USER = os.getenv('USER')
-PASS = os.getenv('PASS')
-DB = os.getenv('DB')
 
-USER_TABLE_NAME = 'user'
-USER_TABLE_ARGS = {
-    "user_id": "INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY",
-    "user_mail": "VARCHAR(50) NOT NULL",
-    "user_hashed_password": "VARCHAR(64) NOT NULL",  # sha256 -> 64 hexa chars
-    "user_name": "VARCHAR(25)"
-}
-# TODO FILL DATA
-USER_DATA = ""
+def _init_user(mail: str, pwd: str, admin: int = 0) -> "dict[str, Union[str, int]]":
+    """Make user' as a user schema for feeding initial database.
 
-PREDICTION_TABLE_NAME = 'prediction'
-PREDICTION_TABLE_ARGS = {
-    "prediction_id": "INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY",
-    "prediction_img": "VARCHAR(100) NOT NULL",
-    "prediction_true": "VARCHAR(20)",
-    "prediction_major": "VARCHAR(20) NOT NULL",
-    "prediction_user_id": "INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY",
-}
-# TODO FILL DATA
-PREDICTION_DATA = ""
-PREDICTION_FK = "ALTER TABLE prediction ADD FOREIGN KEY (user_id) REFERENCES user(user_id)"
+    Encryption of password is done here.
 
-# Init Database object
-db = Database(HOST, USER, PASS, DB)
-# Connection to the db
-conn = db.db_connection()
-# Create the database
-db.create_database()
-# Fill the database with data
-db.fill_database(USER_TABLE_NAME, USER_TABLE_ARGS, USER_DATA)
-db.fill_database(PREDICTION_TABLE_NAME, PREDICTION_TABLE_ARGS, PREDICTION_DATA)
-db.add_foreign_key(PREDICTION_TABLE_NAME, "FK_user_id", USER_TABLE_NAME, "user_id")
-# Disconnect databese
-db.disconnect_db()
+    Args:
+        mail (str): _description_
+        pwd (str): _description_
+        admin (int, optional): _description_. Defaults to 0.
+
+    Returns:
+        dict[str, str | int]: user to feed in db
+    """
+    hashed_pwd = hashlib.sha256(
+        str(mail).encode('utf-8') + str(pwd).encode('utf-8')
+    ).hexdigest()
+    return {
+        "user_email": mail,
+        "user_enc_password": hashed_pwd,
+        "user_is_admin": admin
+    }
+
+
+def get_users() -> list:
+    """Generate and get the users to feed in the db.
+
+    Returns:
+        list[dict[str, str | int]]: list of users
+    """
+    base_users = [
+        ["user@lambda.com", "password", 0],
+        ["user_2@lambda.com", "password_2", 0],
+        [os.environ["ADMIN_MAIL"], os.environ["ADMIN_PASS"], 1],
+    ]
+    users = []
+    for base_user in base_users:
+        users.append(_init_user(*base_user))
+    return users

@@ -63,9 +63,8 @@ def login(db: _orm.Session, user: _schemas.UserCreate):
     """
         query connection of user
     """
-    db_user =  db.query(_models.User).filter(and_(_models.User.user_email == user.user_email, _models.User.user_enc_password == user.user_enc_password)).first()
+    return db.query(_models.User).filter(and_(_models.User.user_email == user.user_email, _models.User.user_enc_password == user.user_enc_password)).first()
 
-    return db_user
 
 
 def update_user(db: _orm.Session, user_id: int, email: str, name: str, password: str):

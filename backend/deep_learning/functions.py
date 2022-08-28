@@ -1,4 +1,4 @@
-from typing import Coroutine
+from typing import Coroutine, Union
 import cv2  # noqa
 import numpy as np
 from tensorflow.keras.models import model_from_json
@@ -15,12 +15,11 @@ emotions = [
     "sad",
 ]
 
-def detect_face(content: Coroutine):
+def detect_face(content: Coroutine) -> Union[np.ndarray, list]:
     nparr = np.fromstring(content, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR).astype(np.float32)
     # convert into grayscale
     gray = np.array(cv2.cvtColor(img, cv2.COLOR_RGB2GRAY), dtype='uint8')
-    # gray = np.array(gray, dtype='uint8')
     # load cascade classifier for detecting faces
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
@@ -35,6 +34,15 @@ def detect_face(content: Coroutine):
 
 
 def make_prediction(img: np.ndarray):
+    emotions = [
+        "angry",
+        "calm",
+        "disgust",
+        "fearful",
+        "happy",
+        "neutral",
+        "sad",
+    ]
     # load model
     model_base = "./deep_learning/fer_2013_1.0/model_48x48"
     with open(f'{model_base}.json', 'r') as f:

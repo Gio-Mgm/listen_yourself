@@ -1,12 +1,16 @@
 import os
 import hashlib
+from sqlite3 import IntegrityError
+from typing import Any, Union
 from fastapi import Depends, FastAPI, HTTPException, status, Body, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import sqlalchemy.orm as _orm
+from db_init import get_users
 import services as _services
 import schemas as _schemas
 import database as _database
+from models import User
 from dotenv import load_dotenv
 from deep_learning.functions import detect_face, make_prediction
 
@@ -41,19 +45,15 @@ app.add_middleware(
 )
 
 _services.create_database()
-admin = {
-    "user_email": os.environ["ADMIN_MAIL"],
-    "user_enc_password": hashlib.sha256(
-        str(os.environ["ADMIN_MAIL"]).encode('utf-8') +
-        str(os.environ["ADMIN_PASS"]).encode('utf-8')
-    ).hexdigest(),
-    "user_is_admin": 1
-}
-_services.create_user(db=_database.SessionLocal() ,user=admin)
+
+
+
+for user in get_users():
+    _services.create_user(db=_database.SessionLocal() ,user=user)
 
 
 @app.get("/")
-async def main():
+async def main() -> "dict[str,str]":
     return {"message": "Hello World"}
 
 
@@ -61,7 +61,7 @@ async def main():
 def create_user(
     user: _schemas.UserCreate,
     db: _orm.Session = Depends(_services.get_db)
-):
+) -> Union[IntegrityError , User]:
     """
         Route for creating user
     """
@@ -75,7 +75,7 @@ def create_user(
 def login(
     user: _schemas.UserCreate,
     db: _orm.Session = Depends(_services.get_db),
-):
+) -> User:
     db_user = _services.login(db=db, user=user)
     print(db_user)
     if db_user is None:
@@ -86,7 +86,7 @@ def login(
 def read_user(
     user_id: int,
     db: _orm.Session = Depends(_services.get_db)
-):
+) -> User:
     """
         Route for getting a user
     """
@@ -109,14 +109,12 @@ def delete_user(id: int):
 
 
 @app.post("/predict")
-async def predict(file: UploadFile = File(...)):
+async def predict(file: UploadFile = File(...)) -> "dict[str, Any]":
     content = await file.read()
     face = detect_face(content)
     if len(face) == 0:
-        return HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="No face detected !")
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="No face detected !")
     return make_prediction(face)
-
-
 
 
 @app.get("/prediction/{id}")
@@ -129,12 +127,12 @@ def update_prediction(id: int):
     pass
 
 @app.get("/prediction")
-def read_prediction_list():
+def read_predictions_list():
     pass
 
 
 @app.get("/predictions/{user_id}")
-def get_predictions(
+def read_predictions(
     skip: int = 0,
     limit: int = 10,
     db: _orm.Session = Depends(_services.get_db)
