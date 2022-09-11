@@ -9,3 +9,8 @@ env
 logs
 deep_learning/models
 _archived
+backend/ai/models
+backend/tmp
+.coverage
+backend/ai/models/vgg13_bn_16.pkl
+.pytest_cache

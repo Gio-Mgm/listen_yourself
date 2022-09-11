@@ -1,5 +1,5 @@
 # Load linux image ( with GPU support) for backend processes
-FROM nvidia/cuda:11.0.3-base-ubuntu20.04
+FROM nvidia/cuda:11.0.3-runtime-ubuntu20.04
 # Set working directory
 WORKDIR /backend
 # Install required linux packages

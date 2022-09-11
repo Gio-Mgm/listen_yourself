@@ -12,6 +12,13 @@ services:
     container_name: backend
     build:
       context: ./backend
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     env_file:
       - ./backend/.env
     volumes:

@@ -34,9 +34,11 @@ shap==0.41.0
 split-folders==0.5.1
 sqlalchemy-utils==0.38.3
 tensorboard
+torch
+torchvision
 # tensorflow==2.9.1
 # tensorflow-addons==0.17.1
-# tensorflow-gpu==2.9.1
+tensorflow-gpu==2.9.1
 trash-cli==0.22.4.16
 uvicorn==0.18.2
 wget==3.2
