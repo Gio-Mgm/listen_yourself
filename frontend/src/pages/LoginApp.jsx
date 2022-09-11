@@ -109,7 +109,7 @@ const LoginApp = ({ setUser }) => {
                     .map(({name, type, value}) => renderFormInput(name, type, value))
                 }
             </div>
-            <Button id="log-submit" type="submit" onSubmit={handleSubmit} className='spotify-green' variant="primary" >
+            <Button id="log-submit" type="submit" onSubmit={handleSubmit}>
                 { C.connectionOptions[logInOrSignUp].text }
             </Button>
         </Form>

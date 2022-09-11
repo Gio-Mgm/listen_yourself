@@ -1,18 +1,15 @@
 import os
-import hashlib
 from sqlite3 import IntegrityError
 from typing import Any, Union
-from fastapi import Depends, FastAPI, HTTPException, status, Body, UploadFile, File
+from fastapi import FastAPI, HTTPException, Response, UploadFile, Depends, File, status
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import sqlalchemy.orm as _orm
-from db_init import get_users
 import services as _services
 import schemas as _schemas
-import database as _database
-from models import User
+from models import Prediction, User
 from dotenv import load_dotenv
-from deep_learning.functions import detect_face, make_prediction
+from ai.predict import detect_face, make_prediction
 
 load_dotenv()
 
@@ -44,14 +41,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-_services.create_database()
-
-
-
-for user in get_users():
-    _services.create_user(db=_database.SessionLocal() ,user=user)
-
-
 @app.get("/")
 async def main() -> "dict[str,str]":
     return {"message": "Hello World"}
@@ -61,7 +50,7 @@ async def main() -> "dict[str,str]":
 def create_user(
     user: _schemas.UserCreate,
     db: _orm.Session = Depends(_services.get_db)
-) -> Union[IntegrityError , User]:
+) -> Union[IntegrityError, User]:
     """
         Route for creating user
     """
@@ -71,16 +60,17 @@ def create_user(
         raise HTTPException(status_code=422, detail="Email already registered ! ")
     return _services.create_user(db=db, user=user)
 
+
 @app.post("/login")
 def login(
     user: _schemas.UserCreate,
     db: _orm.Session = Depends(_services.get_db),
 ) -> User:
     db_user = _services.login(db=db, user=user)
-    print(db_user)
     if db_user is None:
         raise HTTPException(status_code=404, detail="Invalid username or password")
     return db_user
+
 
 @app.get("/user/{user_id}")
 def read_user(
@@ -94,7 +84,6 @@ def read_user(
     db_user = _services.get_user(db=db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, content="This user does not exist")
-    print(db_user)
     return db_user
 
 
@@ -108,13 +97,22 @@ def delete_user(id: int):
     pass
 
 
-@app.post("/predict")
-async def predict(file: UploadFile = File(...)) -> "dict[str, Any]":
-    content = await file.read()
-    face = detect_face(content)
+@app.post("/predict/")
+def predict(file: UploadFile = File(...)) -> "dict[str, Any]":
+    face = detect_face(file)
     if len(face) == 0:
-        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="No face detected !")
-    return make_prediction(face)
+        raise HTTPException(status.HTTP_204_NO_CONTENT, "No face detected !")
+
+    model = './ai/models/vgg13_bn_16.pkl'
+    return make_prediction(face, model)
+
+
+@app.post("/prediction/")
+def create_prediction(
+    prediction: _schemas.PredictionCreate,
+    db: _orm.Session = Depends(_services.get_db)
+) -> Prediction:
+    return _services.create_prediction(db=db, prediction=prediction)
 
 
 @app.get("/prediction/{id}")

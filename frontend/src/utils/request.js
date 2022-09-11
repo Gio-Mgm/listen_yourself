@@ -13,7 +13,6 @@ const fetchRequest = async (method, endpoint, data, headers) => {
     if (method === "POST") {
         init.body = data
     }
-
     return await fetch(url, init)
 }
 

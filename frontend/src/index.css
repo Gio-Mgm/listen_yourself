@@ -30,14 +30,10 @@ img {
 i {
     font-size: 2em;
 }
-/*
-body {
-    font-family: "Playfair";
-    font-weight: bold;
-} */
+
 
 .header-login-div {
-    margin: 10px 30%;
+    margin: 10px 33%;
     border-radius: 25px;
     background-color: rgb(45 38 46);
     border: solid 2px var(--primary_color);
@@ -45,7 +41,7 @@ body {
 }
 
 .heading-login, #not-found > h1 {
-    padding-top:5px;
+    padding-top:20px;
     text-align: center;
     font-family: "Musicografi" ;
 }
@@ -92,12 +88,17 @@ background-clip: text;
     text-align: center;
 }
 
+body {
+    font-family: "Circular";
+}
+
 #app-login * {
     animation: fadein 0.3s linear backwards;
 }
 
 .login, .not-found {
     background-image: url('../public/img/vinyl-background.jpg');
+    background-repeat:round
 }
 
 .reset-container{

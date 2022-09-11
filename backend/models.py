@@ -1,5 +1,7 @@
+"""Define models for the database."""
+
 from datetime import date
-from sqlalchemy import Column, ForeignKey, Integer, String, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import Date
 import database as _database
@@ -22,14 +24,8 @@ class Prediction(_database.Base):
 
     prediction_id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("user.user_id"))
-    prediction_img_path = Column(String(255), unique=True)
-    prediction_angry = Column(Float)
-    prediction_disgust = Column(Float)
-    prediction_fear = Column(Float)
-    prediction_happy = Column(Float)
-    prediction_neutral = Column(Float)
-    prediction_sad = Column(Float)
-    prediction_surprise = Column(Float)
+    prediction_img = Column(Text)
+    predictions = Column(String(255))
     prediction_true = Column(String(255))
     prediction_major = Column(String(255))
 
