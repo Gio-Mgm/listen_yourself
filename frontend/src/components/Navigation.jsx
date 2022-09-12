@@ -27,8 +27,8 @@ const Navigation = ({ isLinked, setView, ThemeToggler, theme}) => {
                     <Nav    onSelect={e => setView(e)} className="me-auto my-2 my-lg-0"
                             style={{ maxHeight: '100px' }}
                             navbarScroll>
-                        <Nav.Item><Nav.Link eventKey="Analyze">Analyze</Nav.Link></Nav.Item>
-                        <Nav.Item><Nav.Link eventKey="Other">Other</Nav.Link></Nav.Item>
+                        <Nav.Item><Nav.Link active={true} eventKey="Prediction">Prediction</Nav.Link></Nav.Item>
+                        <Nav.Item><Nav.Link eventKey="Profile">Profile</Nav.Link></Nav.Item>
                         {/* <NavDropdown title="Link" id="navbarScrollingDropdown">
                             <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
                             <NavDropdown.Item href="#action4">Another action</NavDropdown.Item>
@@ -37,7 +37,6 @@ const Navigation = ({ isLinked, setView, ThemeToggler, theme}) => {
                             </NavDropdown>
                         <Nav.Link href="#" disabled>Link</Nav.Link> */}
                     </Nav>
-                    <ThemeToggler />
                     {searchForm}
                 </Navbar.Collapse>
             </Container>

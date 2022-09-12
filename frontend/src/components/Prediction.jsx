@@ -163,7 +163,8 @@ const Prediction = ({user}) => {
     }
 
     return (
-        <Container>
+        <>
+            <h1 className='display-1'>Prediciton</h1>
             {results && console.log(results)}
             <Row>
                 {radioForm}
@@ -184,7 +185,7 @@ const Prediction = ({user}) => {
                 {results && <img src={`data:image/jpeg;base64,${results[1]}`} style={{width:"150px"}} />}
             </Row>
 
-        </Container>
+        </>
     )
 }
 

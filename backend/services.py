@@ -103,14 +103,17 @@ def read_prediction(db: _orm.Session, prediction_id: int) -> _models.Prediction:
     return db.query(_models.Prediction).filter(_models.Prediction.prediction_id == prediction_id).first()
 
 
-def read_user_predictions(db: _orm.Session, user_id: int) -> list:
-    """Query read all predictions from a user."""
-    return db.query(_models.Prediction).filter(_models.Prediction.user_id == user_id).all()
+# def read_predictions_by_user(db: _orm.Session, user_id: int) -> list:
+#     """Query read all predictions from a user."""
+#     return db.query(_models.Prediction).filter(_models.Prediction.user_id == user_id).all()
 
 
-def read_predictions(db: _orm.Session):
+def read_predictions(db: _orm.Session, user_id: int = None):
     """Query read all predictions."""
-    return db.query(_models.Prediction).all()
+    query = db.query(_models.Prediction)
+    if user_id:
+        return query.filter(_models.Prediction.user_id == user_id).all()
+    return query.all()
 
 
 def update_prediction(db: _orm.Session, prediction_id: int, predictions: dict) -> _models.Prediction:

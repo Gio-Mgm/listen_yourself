@@ -1,6 +1,6 @@
 import os
 from sqlite3 import IntegrityError
-from typing import Any, Union
+from typing import Any, List, Optional, Union
 from fastapi import FastAPI, HTTPException, Response, UploadFile, Depends, File, status
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -116,8 +116,33 @@ def create_prediction(
 
 
 @app.get("/prediction/{id}")
-def read_prediction(id: int):
-    pass
+def read_prediction(
+    prediction_id: int,
+    db: _orm.Session = Depends(_services.get_db)
+) -> User:
+    """
+        Route for getting a prediction
+    """
+
+    db_pred = _services.read_prediction(db=db, prediction_id=prediction_id)
+    if db_pred is None:
+        raise HTTPException(status_code=404, content="This prediction does not exist")
+    return db_pred
+
+@app.get("/predictions")
+def read_predictions(
+    user_id: Optional[int] = None,
+    db: _orm.Session = Depends(_services.get_db)
+) -> List[User]:
+    """
+        Route for getting a prediction
+    """
+
+    db_pred = _services.read_predictions(db=db, user_id=user_id)
+    print(db_pred)
+    if db_pred is None:
+        raise HTTPException(status_code=404, content="No prediction found")
+    return db_pred
 
 
 @app.put("/prediction/{id}")
@@ -139,8 +164,7 @@ def read_predictions(
         Route for getting all stored predictions
     """
 
-    users = _services.get_users(db=db, skip=skip, limit=limit)
-    return users
+    return _services.read_predictions_by_user(db=db, skip=skip, limit=limit)
 
 
 if __name__ == "__main__":
